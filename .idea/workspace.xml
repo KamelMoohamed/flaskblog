@@ -10,8 +10,9 @@
       <change afterPath="$PROJECT_DIR$/flaskblog/posts/__init__.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/flaskblog/posts/forms.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/flaskblog/posts/routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/flaskblog/static/profile_pics/fc7656f8a86b4d719bb49e38906f7864.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/flaskblog/site.db" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/flaskblog/templates/account.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/flaskblog/templates/confirm_register.html" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/flaskblog/templates/errors/403.html" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/flaskblog/templates/errors/404.html" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/flaskblog/templates/errors/500.html" afterDir="false" />
@@ -46,8 +47,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>

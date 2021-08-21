@@ -32,3 +32,15 @@ If you did not make this request then simply ignore this email and no changes wi
 '''
     mail.send(msg)
 
+
+def send_register_email(user, code):
+    token = user.get_reset_token()
+    msg = Message('Email Confirmation Request',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f'''To confirm your email, visit the following link:
+{url_for('users.confirm_email', token=token, _external=True)}
+Your Code: {code}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)

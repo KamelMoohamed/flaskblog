@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request
 from flaskblog import db, bcrypt
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                   ResetPasswordForm, RequestResetForm)
+                                   ResetPasswordForm, RequestResetForm, ConfirmRegister)
 from flaskblog.models import User, Post
-from flaskblog.users.utils import save_picture, send_reset_email
+from flaskblog.users.utils import save_picture, send_reset_email, send_register_email
 from flask_login import login_user, current_user, logout_user, login_required
+from numpy import random
 
 users = Blueprint('users', __name__)
 
@@ -13,13 +14,21 @@ users = Blueprint('users', __name__)
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
+
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        code = random.randint(1000, 1000000)
+        hashed_code = bcrypt.generate_password_hash(f"{code}")
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password, verify_code=hashed_code)
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created! You are now able to log in', 'success')
+
+        # Getting the same user to access the message
+        user1 = User.query.filter_by(email=form.email.data).first()
+        send_register_email(user1, code)
+
+        flash('We send to you an verification email, please check your mail', 'success')
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -31,7 +40,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password, form.password.data) and user.verification:
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('main.home'))
@@ -109,3 +118,21 @@ def reset_token(token):
         flash('Your password has been updated successfully', 'success')
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
+
+
+@users.route('/confirm_email/<token>', methods=['GET', 'POST'])
+def confirm_email(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash("This Invalid or Expired Code", "warning")
+        return redirect(url_for('users.reset_request'))
+    form = ConfirmRegister()
+    if form.validate_on_submit():
+        if user and bcrypt.check_password_hash(user.verify_code, form.code.data):
+            user.verification = True
+            db.session.commit()
+            flash('Your E-mail has been successfully confirmed', 'success')
+            return redirect(url_for('users.login'))
+    return render_template('confirm_register.html', title='Reset Password', form=form)

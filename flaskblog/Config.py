@@ -8,7 +8,7 @@ class Config:
     MAIL_PORT = 587
     MAIL_USE_TLS = True
 
-    MAIL_USERNAME = os.environ.get('GET_USER')
-    MAIL_PASSWORD = os.environ.get('GET_PASS')
+    MAIL_USERNAME = 'senderflaskblog@gmail.com'
+    MAIL_PASSWORD = '5555588888888'
 
     # You can put your username and password direct
